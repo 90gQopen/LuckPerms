@@ -44,7 +44,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerLoginNetworkHandler;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Uuids;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -126,7 +125,7 @@ public class FabricConnectionListener extends AbstractConnectionListener {
         }
 
         // init permissions handler
-        ((MixinUser) player).initializePermissions(user);
+        ((MixinUser) player).luckperms$initializePermissions(user);
 
         this.plugin.getContextManager().signalContextUpdate(player);
     }

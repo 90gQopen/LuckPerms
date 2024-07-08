@@ -32,17 +32,13 @@ import net.luckperms.api.query.QueryOptions;
 import net.luckperms.api.util.Tristate;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import java.util.Locale;
-
 /**
  * Mixin interface for {@link ServerPlayerEntity} implementing {@link User} related
  * caches and functions.
  */
 public interface MixinUser {
 
-    User getLuckPermsUser();
-
-    QueryOptionsCache<ServerPlayerEntity> getQueryOptionsCache();
+    User luckperms$getUser();
 
     /**
      * Gets (or creates using the manager) the objects {@link QueryOptionsCache}.
@@ -50,23 +46,23 @@ public interface MixinUser {
      * @param contextManager the contextManager
      * @return the cache
      */
-    QueryOptionsCache<ServerPlayerEntity> getQueryOptionsCache(FabricContextManager contextManager);
+    QueryOptionsCache<ServerPlayerEntity> luckperms$getQueryOptionsCache(FabricContextManager contextManager);
 
     /**
      * Initialises permissions for this player using the given {@link User}.
      *
      * @param user the user
      */
-    void initializePermissions(User user);
+    void luckperms$initializePermissions(User user);
 
     // methods to perform permission checks using the User instance initialised on login
 
-    Tristate hasPermission(String permission);
+    Tristate luckperms$hasPermission(String permission);
 
-    Tristate hasPermission(String permission, QueryOptions queryOptions);
+    Tristate luckperms$hasPermission(String permission, QueryOptions queryOptions);
 
-    String getOption(String key);
+    String luckperms$getOption(String key);
 
-    String getOption(String key, QueryOptions queryOptions);
+    String luckperms$getOption(String key, QueryOptions queryOptions);
 
 }

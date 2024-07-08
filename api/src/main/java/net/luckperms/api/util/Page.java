@@ -23,34 +23,31 @@
  *  SOFTWARE.
  */
 
-package me.lucko.luckperms.common.bulkupdate.query;
+package net.luckperms.api.util;
 
-import java.util.Locale;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.List;
 
 /**
- * Represents a field being used in an update
+ * Represents a page of entries.
+ *
+ * @since 5.5
  */
-public enum QueryField {
+public interface Page<T> {
 
-    PERMISSION("permission"),
-    SERVER("server"),
-    WORLD("world");
+    /**
+     * Gets the entries on this page.
+     *
+     * @return the entries
+     */
+    @NonNull List<T> entries();
 
-    private final String sqlName;
+    /**
+     * Gets the total/overall number of entries (not just the number of entries on this page).
+     *
+     * @return the total number of entries
+     */
+    int overallSize();
 
-    public static QueryField of(String s) {
-        try {
-            return valueOf(s.toUpperCase(Locale.ROOT));
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
-
-    QueryField(String sqlName) {
-        this.sqlName = sqlName;
-    }
-
-    public String getSqlName() {
-        return this.sqlName;
-    }
 }

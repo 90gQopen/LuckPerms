@@ -23,20 +23,7 @@
  *  SOFTWARE.
  */
 
-package me.lucko.luckperms.fabric.event;
-
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-
-// TODO: Use Fabric API alternative when merged.
-public interface PlayerChangeWorldCallback {
-    Event<PlayerChangeWorldCallback> EVENT = EventFactory.createArrayBacked(PlayerChangeWorldCallback.class, callbacks -> (originalWorld, destination, player) -> {
-        for (PlayerChangeWorldCallback callback : callbacks) {
-            callback.onChangeWorld(originalWorld, destination, player);
-        }
-    });
-
-    void onChangeWorld(ServerWorld originalWorld, ServerWorld destination, ServerPlayerEntity player);
-}
+/**
+ * {@link net.luckperms.api.actionlog.Action} filters.
+ */
+package net.luckperms.api.actionlog.filter;

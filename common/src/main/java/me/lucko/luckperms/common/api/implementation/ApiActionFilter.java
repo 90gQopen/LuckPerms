@@ -23,48 +23,25 @@
  *  SOFTWARE.
  */
 
-package me.lucko.luckperms.common.bulkupdate.comparison;
+package me.lucko.luckperms.common.api.implementation;
 
-import me.lucko.luckperms.common.bulkupdate.PreparedStatementBuilder;
+import me.lucko.luckperms.common.filter.FilterList;
+import net.luckperms.api.actionlog.Action;
+import net.luckperms.api.actionlog.filter.ActionFilter;
 
-/**
- * A method of comparing two strings
- */
-public interface Comparison {
+public class ApiActionFilter implements ActionFilter {
+    private final FilterList<Action> filter;
 
-    /**
-     * Gets the symbol which represents this comparison
-     *
-     * @return the comparison symbol
-     */
-    String getSymbol();
-
-    /**
-     * Creates a {@link CompiledExpression} for the given expression
-     *
-     * @param expression the expression
-     * @return the compiled expression
-     */
-    CompiledExpression compile(String expression);
-
-    /**
-     * Returns the comparison operator in SQL form
-     */
-    void appendSql(PreparedStatementBuilder builder);
-
-    /**
-     * An instance of {@link Comparison} which is bound to an expression.
-     */
-    interface CompiledExpression {
-
-        /**
-         * Tests the expression against a given string, according to the
-         * rules of the parent {@link Comparison}.
-         *
-         * @param string the string
-         * @return if there was a match
-         */
-        boolean test(String string);
+    public ApiActionFilter(FilterList<Action> filter) {
+        this.filter = filter;
     }
 
+    @Override
+    public boolean test(Action action) {
+        return this.filter.evaluate(action);
+    }
+
+    public FilterList<Action> getFilter() {
+        return this.filter;
+    }
 }
