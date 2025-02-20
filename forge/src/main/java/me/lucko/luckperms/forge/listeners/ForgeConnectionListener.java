@@ -49,7 +49,6 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 public class ForgeConnectionListener extends AbstractConnectionListener {
     private static final ConfigurationTask.Type USER_LOGIN_TASK_TYPE = new ConfigurationTask.Type("luckperms:user_login");
@@ -80,9 +79,12 @@ public class ForgeConnectionListener extends AbstractConnectionListener {
             this.plugin.getLogger().info("Processing pre-login (sync phase) for " + uniqueId + " - " + username);
         }
 
-        event.addTask(new AsyncConfigurationTask(this.plugin, USER_LOGIN_TASK_TYPE, ctx -> CompletableFuture.runAsync(() -> {
-            onPlayerNegotiationAsync(ctx.getConnection(), uniqueId, username);
-        }, this.plugin.getBootstrap().getScheduler().async())));
+        AsyncConfigurationTask task = new AsyncConfigurationTask(
+                this.plugin,
+                USER_LOGIN_TASK_TYPE,
+                () -> onPlayerNegotiationAsync(event.getConnection(), uniqueId, username)
+        );
+        event.addTask(task);
     }
 
     private void onPlayerNegotiationAsync(Connection connection, UUID uniqueId, String username) {
