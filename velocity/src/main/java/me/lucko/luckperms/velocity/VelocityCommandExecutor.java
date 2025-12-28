@@ -26,6 +26,7 @@
 package me.lucko.luckperms.velocity;
 
 import com.velocitypowered.api.command.RawCommand;
+import com.velocitypowered.api.permission.Tristate;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import com.velocitypowered.api.proxy.ProxyServer;
 import me.lucko.luckperms.common.command.CommandManager;
@@ -76,6 +77,11 @@ public class VelocityCommandExecutor extends CommandManager implements RawComman
         Sender wrapped = this.plugin.getSenderFactory().wrap(invocation.source());
         List<String> arguments = ArgumentTokenizer.TAB_COMPLETE.tokenizeInput(invocation.arguments());
         return tabCompleteCommand(wrapped, arguments);
+    }
+
+    @Override
+    public boolean hasPermission(Invocation invocation) {
+        return invocation.source().getPermissionValue(BASE_PERMISSION) == Tristate.TRUE;
     }
 
     private static class ForwardingCommand implements RawCommand {

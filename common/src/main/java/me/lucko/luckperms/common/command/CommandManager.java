@@ -95,6 +95,8 @@ import java.util.stream.Collectors;
  */
 public class CommandManager {
 
+    protected static final String BASE_PERMISSION = "luckperms.command.base";
+
     private final LuckPermsPlugin plugin;
     private final ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder()
             .setDaemon(true)
