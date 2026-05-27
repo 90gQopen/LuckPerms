@@ -32,15 +32,17 @@ jobs:
       - name: Get version from gradle
         id: get_version
         run: |
-          VERSION=$(./gradlew properties -q | grep "^version:" | awk '{print $2}')
+          VERSION=$(./gradlew :bukkit:loader:properties -q | grep "^version:" | awk '{print $2}')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Building version: $VERSION"
 
-      - name: Upload LuckPerms Bukkit JAR artifact
+      - name: Upload LuckPerms JAR artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: luckperms-bukkit-jar
-          path: bukkit/loader/build/libs/LuckPerms-Bukkit-*.jar
+          name: luckperms-jars
+          path: |
+            bukkit/loader/build/libs/LuckPerms-Bukkit-*.jar
+            velocity/build/libs/LuckPerms-Velocity-*.jar
           if-no-files-found: error
           retention-days: 90
 
@@ -50,12 +52,14 @@ jobs:
           tag_name: v${{ steps.get_version.outputs.version }}-build.${{ github.run_number }}
           name: LuckPerms v${{ steps.get_version.outputs.version }} Build ${{ github.run_number }}
           body: |
-            Automated build of LuckPerms (Bukkit/Paper)
+            Automated build of LuckPerms (Bukkit/Paper + Velocity)
             
             **Version:** ${{ steps.get_version.outputs.version }}
             **Build Number:** ${{ github.run_number }}
             **Commit:** ${{ github.sha }}
-          files: bukkit/loader/build/libs/LuckPerms-Bukkit-*.jar
+          files: |
+            bukkit/loader/build/libs/LuckPerms-Bukkit-*.jar
+            velocity/build/libs/LuckPerms-Velocity-*.jar
           draft: false
           prerelease: true
         env:
