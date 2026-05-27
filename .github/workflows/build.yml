@@ -14,29 +14,33 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 25
-          cache: maven
 
-      - name: Build with Maven
-        run: mvn clean install -DskipTests
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
-      - name: Get version from pom.xml
+      - name: Clean Build
+        run: ./gradlew clean build
+
+      - name: Get version from gradle
         id: get_version
         run: |
-          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          VERSION=$(./gradlew properties -q | grep "^version:" | awk '{print $2}')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Building version: $VERSION"
 
-      - name: Upload LuckPerms JAR artifact
+      - name: Upload LuckPerms Bukkit JAR artifact
         uses: actions/upload-artifact@v4
         with:
-          name: luckperms-jar
-          path: target/LuckPerms-*.jar
+          name: luckperms-bukkit-jar
+          path: bukkit/loader/build/libs/LuckPerms-Bukkit-*.jar
           if-no-files-found: error
           retention-days: 90
 
@@ -46,12 +50,12 @@ jobs:
           tag_name: v${{ steps.get_version.outputs.version }}-build.${{ github.run_number }}
           name: LuckPerms v${{ steps.get_version.outputs.version }} Build ${{ github.run_number }}
           body: |
-            Automated build of LuckPerms
+            Automated build of LuckPerms (Bukkit/Paper)
             
             **Version:** ${{ steps.get_version.outputs.version }}
             **Build Number:** ${{ github.run_number }}
             **Commit:** ${{ github.sha }}
-          files: target/LuckPerms-*.jar
+          files: bukkit/loader/build/libs/LuckPerms-Bukkit-*.jar
           draft: false
           prerelease: true
         env:
