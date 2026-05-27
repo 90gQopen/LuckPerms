@@ -1,0 +1,71 @@
+name: build
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 25
+          cache: maven
+
+      - name: Build with Maven
+        run: mvn clean install -DskipTests
+
+      - name: Get version from pom.xml
+        id: get_version
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Building version: $VERSION"
+
+      - name: Upload LuckPerms JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: luckperms-jar
+          path: target/LuckPerms-*.jar
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}-build.${{ github.run_number }}
+          name: LuckPerms v${{ steps.get_version.outputs.version }} Build ${{ github.run_number }}
+          body: |
+            Automated build of LuckPerms
+            
+            **Version:** ${{ steps.get_version.outputs.version }}
+            **Build Number:** ${{ github.run_number }}
+            **Commit:** ${{ github.sha }}
+          files: target/LuckPerms-*.jar
+          draft: false
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Send Discord notification
+        uses: Ilshidur/action-discord@0.4.0
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_USERNAME: LuckPerms Release
+          DISCORD_AVATAR: https://i.gyazo.com/6de7e708f4c7c58910bbc9624e941377.png
+        with:
+          args: |
+            "## Automatic Build"
+            "**LuckPerms v${{ steps.get_version.outputs.version }}-build.${{ github.run_number }} has been released!**"
+            ""
+            "<https://github.com/90gqopen/LuckPerms/releases/tag/v${{ steps.get_version.outputs.version }}-build.${{ github.run_number }}>"
